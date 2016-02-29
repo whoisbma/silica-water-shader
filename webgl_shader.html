@@ -53,14 +53,14 @@
 		//--------------------------
 			// #define SHOW_TILING
 			#define TAU 6.28318530718
-			#define MAX_ITER 5
+			#define MAX_ITER 30
 
 			uniform vec2 resolution;
 			uniform float time;
 
 			void main()	{
 
-				float time2 = time * 0.001 + 23.0;
+				float time2 = time * 0.01 + 23.0;
 				vec2 uv = gl_FragCoord.xy / resolution.xy;
 
 				#ifdef SHOW_TILING
@@ -71,19 +71,21 @@
 
 				vec2 i = vec2(p);
 				float c = 1.0;
-				float inten = .005;
+				float inten = .003;
 
-				for (int n = 0; n < MAX_ITER; n++) 
+				for (int n = 0; n < MAX_ITER; n+=1) 
 				{
-					float t = time2 * (1.0 - (3.5 / float(n+1)));
+					float t = time2 * (1.0 - (2.5 / float(n+1)));
+					// t = time2 * n;
 					i = p + vec2(cos(t - i.x) + sin(t + i.y), sin(t - i.y) + cos(t + i.x));
-					c += 1.0/length(vec2(p.x / (sin(i.x+t)/inten),p.y / (cos(i.y+t)/inten)));
+					c += 1.0/length(vec2(p.x / (sin(i.x+t)/inten), p.y / (cos(i.y+t)/inten)));
 				}
 
 				c /= float(MAX_ITER);
-				c = 1.17-pow(c, 1.4);
-				vec3 colour = vec3(pow(abs(c), 8.0));
- 				colour = clamp(colour + vec3(0.0, 0.35, 0.5), 0.0, 1.0);
+				c = 1.17-pow(c, 1.5);
+				vec3 color = vec3(pow(abs(c), 8.0));
+ 				color = clamp(color + vec3(0.0, 0.3, 0.55), 0.19, 1.0);
+ 				// color = vec3(c);
 
  				#ifdef SHOW_TILING
 					// Flash tile borders...
@@ -93,11 +95,11 @@
 					float f = floor(mod(time*.5, 2.0)); 	// Flash value.
 					vec2 first = step(pixel, uv) * f;		   	// Rule out first screen pixels and flash.
 					uv  = step(fract(uv), pixel);				// Add one line of pixels per tile.
-					colour = mix(colour, vec3(1.0, 1.0, 0.0), (uv.x + uv.y) * first.x * first.y); // Yellow line
+					color = mix(color, vec3(1.0, 1.0, 0.0), (uv.x + uv.y) * first.x * first.y); // Yellow line
 	
 				#endif
 			
-				gl_FragColor = vec4(colour, 1.0);
+				gl_FragColor = vec4(color, 1.0);
 
 			}
 
